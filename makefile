@@ -1,4 +1,4 @@
-SOURCES = main.c mainwindow.c buttonmenu.c
+SOURCES = main.c mainwindow.c menubar.c buttonmenu.c
 OBJS    = ${SOURCES:.c=.o}
 CFLAGS  = `pkg-config gtk+-3.0 --cflags`
 LDADD   = `pkg-config gtk+-3.0 --libs`
