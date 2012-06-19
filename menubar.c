@@ -1,9 +1,10 @@
 #include <gtk/gtk.h>
 
 #include "menubar.h"
+#include "exitdialog.h"
 
 int
-menubar (GtkWidget *main_grid)
+menubar (GtkWidget *window, GtkWidget *main_grid)
 {
   GtkWidget *menubar;
   GtkWidget *filemenu;
@@ -32,11 +33,17 @@ menubar (GtkWidget *main_grid)
 
   gtk_grid_attach (GTK_GRID (main_grid), menubar, 0, 0, 1, 1);
 
-  g_signal_connect (G_OBJECT (quit), "activate",
-                    G_CALLBACK (on_quit), NULL);
+  g_signal_connect (quit, "activate",
+                    G_CALLBACK (on_quit), window);
 
   return 0;
 }
 
 void
-on_quit ()
+on_quit (GtkWidget *widget,
+         GdkEvent  *event,
+         GtkWidget *data)
+{
+  if (exitdialog (GTK_WIDGET (data)))
+    gtk_main_quit ();
+}
