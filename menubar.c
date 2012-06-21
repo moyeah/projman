@@ -41,9 +41,8 @@ menubar (GtkWidget *window, GtkWidget *main_grid)
 
 void
 on_quit (GtkWidget *widget,
-         GdkEvent  *event,
-         GtkWidget *data)
+         gpointer   data)
 {
-  if (exitdialog (GTK_WIDGET (data)))
+  if (!exitdialog (GTK_WIDGET (data)))
     gtk_main_quit ();
 }
