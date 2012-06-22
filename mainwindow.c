@@ -16,7 +16,7 @@ mainwindow (int argc, char *argv[])
   window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_window_set_title (GTK_WINDOW (window), "Project Management");
   gtk_window_set_position (GTK_WINDOW (window), GTK_WIN_POS_CENTER);
-  gtk_window_set_default_size (GTK_WINDOW (window), 800, 600);
+  gtk_window_set_default_size (GTK_WINDOW (window), 1024, 768);
 
   main_grid = gtk_grid_new ();
   gtk_container_add (GTK_CONTAINER (window), main_grid);
