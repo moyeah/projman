@@ -1,10 +1,11 @@
 #include <gtk/gtk.h>
 
 #include "menubar.h"
+#include "newprojectdialog.h"
 #include "exitdialog.h"
 
 int
-menubar (GtkWidget *window, GtkWidget *main_grid)
+menubar (GtkWidget *main_window, GtkWidget *main_grid)
 {
   GtkWidget *menubar;
   GtkWidget *filemenu;
@@ -33,15 +34,24 @@ menubar (GtkWidget *window, GtkWidget *main_grid)
 
   gtk_grid_attach (GTK_GRID (main_grid), menubar, 0, 0, 1, 1);
 
+  g_signal_connect (new, "activate",
+                    G_CALLBACK (on_file_new), main_window);
   g_signal_connect (quit, "activate",
-                    G_CALLBACK (on_quit), window);
+                    G_CALLBACK (on_file_quit), main_window);
 
   return 0;
 }
 
 void
-on_quit (GtkWidget *widget,
-         gpointer   data)
+on_file_new (GtkWidget *widget,
+             gpointer   data)
+{
+  newprojectdialog (GTK_WIDGET (data));
+}
+
+void
+on_file_quit (GtkWidget *widget,
+              gpointer   data)
 {
   if (!exitdialog (GTK_WIDGET (data)))
     gtk_main_quit ();
