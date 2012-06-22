@@ -36,12 +36,14 @@ newprojectdialog (GtkWidget *main_window)
                       0);
 
   project_grid = gtk_grid_new ();
-  gtk_grid_set_column_spacing (GTK_GRID (project_grid), 5);
+  gtk_grid_set_column_spacing (GTK_GRID (project_grid), 10);
+  gtk_grid_set_row_spacing (GTK_GRID (project_grid), 10);
   gtk_container_set_border_width (GTK_CONTAINER (project_grid), 10);
   gtk_container_add (GTK_CONTAINER (project_frame),
                      project_grid);
 
   project_name_label = gtk_label_new_with_mnemonic ("_Name");
+  gtk_widget_set_halign (project_name_label, GTK_ALIGN_END);
   gtk_grid_attach (GTK_GRID (project_grid),
                    project_name_label,
                    0, 0, 1, 1);
@@ -56,6 +58,8 @@ newprojectdialog (GtkWidget *main_window)
                    1, 0, 1, 1);
 
   project_description_label = gtk_label_new_with_mnemonic ("_Description");
+  gtk_widget_set_halign (project_description_label, GTK_ALIGN_END);
+  gtk_widget_set_valign (project_description_label, GTK_ALIGN_START);
   gtk_grid_attach (GTK_GRID (project_grid),
                    project_description_label,
                    0, 1, 1, 1);
