@@ -1,10 +1,19 @@
 #include <gtk/gtk.h>
 
+enum
+{
+  REFERENCE,
+  DESCRIPTION,
+  AMOUNT,
+  N_COLUMNS
+};
+
 int
 newprojectdialog (GtkWidget *main_window)
 {
   GtkWidget *dialog;
   GtkWidget *content_area;
+  GtkWidget *project_frame_label;
   GtkWidget *project_frame;
   GtkWidget *project_grid;
   GtkWidget *project_name_label;
@@ -13,6 +22,12 @@ newprojectdialog (GtkWidget *main_window)
   GtkWidget *project_description_swin;
   GtkWidget *project_description_view;
   GtkTextBuffer *project_description;
+  GtkWidget *invoices_frame_label;
+  GtkWidget *invoices_frame;
+  GtkTreeStore *invoices_store;
+  GtkWidget *invoices_tree;
+  GtkTreeViewColumn *invoices_column;
+  GtkCellRenderer *invoices_renderer;
 
   dialog = gtk_dialog_new_with_buttons ("Creating a new Project...",
                                         GTK_WINDOW (main_window),
@@ -31,7 +46,13 @@ newprojectdialog (GtkWidget *main_window)
                                gdk_screen_height () * 1/2);
   gtk_container_set_border_width (GTK_CONTAINER (content_area), 10);
 
-  project_frame = gtk_frame_new ("Project");
+  project_frame_label = gtk_label_new (NULL);
+  gtk_label_set_markup (GTK_LABEL (project_frame_label),
+                        "<span font_weight=\"bold\">Project</span>");
+
+  project_frame = gtk_frame_new (NULL);
+  gtk_frame_set_label_widget (GTK_FRAME (project_frame),
+                              project_frame_label);
   gtk_box_pack_start (GTK_BOX (content_area),
                       project_frame,
                       TRUE,
@@ -91,7 +112,68 @@ newprojectdialog (GtkWidget *main_window)
 
   project_description = gtk_text_view_get_buffer (
                           GTK_TEXT_VIEW (project_description_view));
-  
+
+  invoices_frame_label = gtk_label_new (NULL);
+  gtk_label_set_markup (GTK_LABEL (invoices_frame_label),
+                        "<span font_weight=\"bold\">Invoices</span>");
+
+  invoices_frame = gtk_frame_new (NULL);
+  gtk_frame_set_label_widget (GTK_FRAME (invoices_frame),
+                              invoices_frame_label);
+  gtk_box_pack_start (GTK_BOX (content_area),
+                      invoices_frame,
+                      TRUE,
+                      TRUE,
+                      0);
+
+  GtkTreeIter invoices_iter;
+
+  invoices_store = gtk_tree_store_new (N_COLUMNS,
+                                       G_TYPE_STRING,
+                                       G_TYPE_STRING,
+                                       G_TYPE_DOUBLE);
+  gtk_tree_store_append (invoices_store, &invoices_iter, NULL);
+
+  invoices_tree = gtk_tree_view_new_with_model (GTK_TREE_MODEL (
+                                                invoices_store));
+
+  invoices_renderer = gtk_cell_renderer_text_new ();
+  g_object_set (G_OBJECT (invoices_renderer),
+                "editable", TRUE,
+                NULL);
+  invoices_column = gtk_tree_view_column_new_with_attributes (
+                      "Reference", invoices_renderer,
+                      "text", REFERENCE,
+                      NULL);
+  gtk_tree_view_append_column (GTK_TREE_VIEW (invoices_tree),
+                               invoices_column);
+
+  invoices_renderer = gtk_cell_renderer_text_new ();
+  g_object_set (G_OBJECT (invoices_renderer),
+                "editable", TRUE,
+                NULL);
+  invoices_column = gtk_tree_view_column_new_with_attributes (
+                      "Description", invoices_renderer,
+                      "text", DESCRIPTION,
+                      NULL);
+  gtk_tree_view_append_column (GTK_TREE_VIEW (invoices_tree),
+                               invoices_column);
+  //gtk_tree_view_set_expander_column (GTK_TREE_VIEW (invoices_tree),
+                                     //invoices_column);
+
+  invoices_renderer = gtk_cell_renderer_text_new ();
+  g_object_set (G_OBJECT (invoices_renderer),
+                "editable", TRUE,
+                NULL);
+  invoices_column = gtk_tree_view_column_new_with_attributes (
+                      "Amount", invoices_renderer,
+                      "text", AMOUNT,
+                      NULL);
+  gtk_tree_view_append_column (GTK_TREE_VIEW (invoices_tree),
+                               invoices_column);
+
+  gtk_container_add (GTK_CONTAINER (invoices_frame),
+                     invoices_tree);
 
   gtk_widget_show_all (dialog);
 
