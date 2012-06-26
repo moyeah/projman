@@ -10,6 +10,7 @@ newprojectdialog (GtkWidget *main_window)
   GtkWidget *project_name_label;
   GtkWidget *project_name;
   GtkWidget *project_description_label;
+  GtkWidget *project_description_swin;
   GtkWidget *project_description_view;
   GtkTextBuffer *project_description;
 
@@ -25,7 +26,9 @@ newprojectdialog (GtkWidget *main_window)
 //  gtk_window_set_default (GTK_WINDOW (dialog),
 
   content_area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
-  gtk_window_set_default_size (GTK_WINDOW (dialog), 800, 600);
+  gtk_window_set_default_size (GTK_WINDOW (dialog),
+                               gdk_screen_width () * 1/2,
+                               gdk_screen_height () * 1/2);
   gtk_container_set_border_width (GTK_CONTAINER (content_area), 10);
 
   project_frame = gtk_frame_new ("Project");
@@ -44,33 +47,47 @@ newprojectdialog (GtkWidget *main_window)
 
   project_name_label = gtk_label_new_with_mnemonic ("_Name");
   gtk_widget_set_halign (project_name_label, GTK_ALIGN_END);
-  gtk_grid_attach (GTK_GRID (project_grid),
-                   project_name_label,
-                   0, 0, 1, 1);
+  gtk_grid_attach_next_to (GTK_GRID (project_grid),
+                           project_name_label,
+                           NULL,
+                           GTK_POS_TOP,
+                           1, 1);
 
   project_name = gtk_entry_new ();
   gtk_entry_set_activates_default (GTK_ENTRY (project_name), TRUE);
   gtk_label_set_mnemonic_widget (GTK_LABEL (project_name_label),
                                  project_name);
   gtk_widget_set_hexpand (project_name, TRUE);
-  gtk_grid_attach (GTK_GRID (project_grid),
-                   project_name,
-                   1, 0, 1, 1);
+  gtk_grid_attach_next_to (GTK_GRID (project_grid),
+                           project_name,
+                           project_name_label,
+                           GTK_POS_RIGHT,
+                           1, 1);
 
   project_description_label = gtk_label_new_with_mnemonic ("_Description");
   gtk_widget_set_halign (project_description_label, GTK_ALIGN_END);
   gtk_widget_set_valign (project_description_label, GTK_ALIGN_START);
-  gtk_grid_attach (GTK_GRID (project_grid),
-                   project_description_label,
-                   0, 1, 1, 1);
+  gtk_grid_attach_next_to (GTK_GRID (project_grid),
+                           project_description_label,
+                           NULL,
+                           GTK_POS_BOTTOM,
+                           1, 1);
+
+  project_description_swin = gtk_scrolled_window_new (NULL, NULL);
+  gtk_widget_set_hexpand (project_description_swin, TRUE);
+  gtk_widget_set_vexpand (project_description_swin, TRUE);
+  gtk_grid_attach_next_to (GTK_GRID (project_grid),
+                           project_description_swin,
+                           project_description_label,
+                           GTK_POS_RIGHT,
+                           1, 1);
 
   project_description_view = gtk_text_view_new ();
   gtk_label_set_mnemonic_widget (GTK_LABEL (project_description_label),
                                  project_description_view);
   gtk_widget_set_hexpand (project_description_view, TRUE);
-  gtk_grid_attach (GTK_GRID (project_grid),
-                   project_description_view,
-                   1, 1, 1, 1);
+  gtk_container_add (GTK_CONTAINER (project_description_swin),
+                     project_description_view);
 
   project_description = gtk_text_view_get_buffer (
                           GTK_TEXT_VIEW (project_description_view));
