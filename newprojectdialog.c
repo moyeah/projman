@@ -115,7 +115,7 @@ newprojectdialog (GtkWidget *main_window)
 
   invoices_frame_label = gtk_label_new (NULL);
   gtk_label_set_markup (GTK_LABEL (invoices_frame_label),
-                        "<span font_weight=\"bold\">Invoices</span>");
+                   "<span font_weight=\"bold\">Invoices and Payments</span>");
 
   invoices_frame = gtk_frame_new (NULL);
   gtk_frame_set_label_widget (GTK_FRAME (invoices_frame),
@@ -127,12 +127,14 @@ newprojectdialog (GtkWidget *main_window)
                       0);
 
   GtkTreeIter invoices_iter;
+  GtkTreeIter payments_iter;
 
   invoices_store = gtk_tree_store_new (N_COLUMNS,
                                        G_TYPE_STRING,
                                        G_TYPE_STRING,
                                        G_TYPE_DOUBLE);
   gtk_tree_store_append (invoices_store, &invoices_iter, NULL);
+  gtk_tree_store_append (invoices_store, &payments_iter, &invoices_iter);
 
   invoices_tree = gtk_tree_view_new_with_model (GTK_TREE_MODEL (
                                                 invoices_store));
@@ -145,6 +147,11 @@ newprojectdialog (GtkWidget *main_window)
                       "Reference", invoices_renderer,
                       "text", REFERENCE,
                       NULL);
+  gtk_tree_view_column_set_spacing (invoices_column, 5);
+  gtk_tree_view_column_set_resizable (invoices_column, TRUE);
+  gtk_tree_view_column_set_expand (invoices_column, TRUE);
+  gtk_tree_view_column_set_alignment (invoices_column, 0.5);
+  gtk_tree_view_column_set_reorderable (invoices_column, TRUE);
   gtk_tree_view_append_column (GTK_TREE_VIEW (invoices_tree),
                                invoices_column);
 
@@ -156,6 +163,11 @@ newprojectdialog (GtkWidget *main_window)
                       "Description", invoices_renderer,
                       "text", DESCRIPTION,
                       NULL);
+  gtk_tree_view_column_set_spacing (invoices_column, 5);
+  gtk_tree_view_column_set_resizable (invoices_column, TRUE);
+  gtk_tree_view_column_set_expand (invoices_column, TRUE);
+  gtk_tree_view_column_set_alignment (invoices_column, 0.5);
+  gtk_tree_view_column_set_reorderable (invoices_column, TRUE);
   gtk_tree_view_append_column (GTK_TREE_VIEW (invoices_tree),
                                invoices_column);
   //gtk_tree_view_set_expander_column (GTK_TREE_VIEW (invoices_tree),
@@ -169,6 +181,11 @@ newprojectdialog (GtkWidget *main_window)
                       "Amount", invoices_renderer,
                       "text", AMOUNT,
                       NULL);
+  gtk_tree_view_column_set_spacing (invoices_column, 5);
+  gtk_tree_view_column_set_resizable (invoices_column, TRUE);
+  gtk_tree_view_column_set_expand (invoices_column, TRUE);
+  gtk_tree_view_column_set_alignment (invoices_column, 0.5);
+  gtk_tree_view_column_set_reorderable (invoices_column, TRUE);
   gtk_tree_view_append_column (GTK_TREE_VIEW (invoices_tree),
                                invoices_column);
 
