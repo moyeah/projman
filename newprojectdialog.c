@@ -18,6 +18,34 @@ set_column (GtkTreeViewColumn *column)
   gtk_tree_view_column_set_reorderable (column, TRUE);
 }
 
+static GtkWidget *
+create_frame (GtkWidget *content_area, const char *frame_label)
+{
+  GtkWidget *label;
+  GtkWidget *frame;
+  GtkWidget *grid;
+
+  label = gtk_label_new (NULL);
+  gtk_label_set_markup (GTK_LABEL (label),
+                        g_markup_printf_escaped ("<b>%s</b>", frame_label));
+
+  frame = gtk_frame_new (NULL);
+  gtk_frame_set_label_widget (GTK_FRAME (frame), label);
+  gtk_box_pack_start (GTK_BOX (content_area),
+                      frame,
+                      TRUE,
+                      TRUE,
+                      5);
+
+  grid = gtk_grid_new ();
+  gtk_grid_set_column_spacing (GTK_GRID (grid), 10);
+  gtk_grid_set_row_spacing (GTK_GRID (grid), 10);
+  gtk_container_set_border_width (GTK_CONTAINER (grid), 10);
+  gtk_container_add (GTK_CONTAINER (frame), grid);
+
+  return grid;
+}
+
 int
 newprojectdialog (GtkWidget *main_window)
 {
@@ -48,37 +76,21 @@ newprojectdialog (GtkWidget *main_window)
 
 //  gtk_window_set_default (GTK_WINDOW (dialog),
 
-  content_area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
   gtk_window_set_default_size (GTK_WINDOW (dialog),
                                gdk_screen_width () * 1/2,
                                gdk_screen_height () * 1/2);
+
+  content_area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
   gtk_container_set_border_width (GTK_CONTAINER (content_area), 10);
 
-  label = gtk_label_new (NULL);
-  gtk_label_set_markup (GTK_LABEL (label),
-                        "<b>Project</b>");
-
-  frame = gtk_frame_new (NULL);
-  gtk_frame_set_label_widget (GTK_FRAME (frame),
-                              label);
-  gtk_box_pack_start (GTK_BOX (content_area),
-                      frame,
-                      TRUE,
-                      TRUE,
-                      0);
-
-  grid = gtk_grid_new ();
-  gtk_grid_set_column_spacing (GTK_GRID (grid), 10);
-  gtk_grid_set_row_spacing (GTK_GRID (grid), 10);
-  gtk_container_set_border_width (GTK_CONTAINER (grid), 10);
-  gtk_container_add (GTK_CONTAINER (frame), grid);
+  grid = create_frame (content_area, "Project");
 
   label = gtk_label_new_with_mnemonic ("_Name");
   gtk_widget_set_halign (label, GTK_ALIGN_END);
   gtk_grid_attach_next_to (GTK_GRID (grid),
                            label,
                            NULL,
-                           GTK_POS_TOP,
+                           GTK_POS_BOTTOM,
                            1, 1);
 
   name = gtk_entry_new ();
@@ -114,19 +126,9 @@ newprojectdialog (GtkWidget *main_window)
   gtk_widget_set_hexpand (view, TRUE);
   gtk_container_add (GTK_CONTAINER (scrollable_window), view);
 
-  description = gtk_text_view_get_buffer (
-                          GTK_TEXT_VIEW (view));
+  description = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
 
-  label = gtk_label_new (NULL);
-  gtk_label_set_markup (GTK_LABEL (label), "<b>Orders and Payments</b>");
-
-  frame = gtk_frame_new (NULL);
-  gtk_frame_set_label_widget (GTK_FRAME (frame), label);
-  gtk_box_pack_start (GTK_BOX (content_area),
-                      frame,
-                      TRUE,
-                      TRUE,
-                      0);
+  grid = create_frame (content_area, "Orders and Payments");
 
   orders = gtk_tree_store_new (N_COLUMNS,
                                G_TYPE_STRING,
@@ -136,6 +138,8 @@ newprojectdialog (GtkWidget *main_window)
   gtk_tree_store_append (orders, &child_iter, &root_iter);
 
   tree = gtk_tree_view_new_with_model (GTK_TREE_MODEL (orders));
+  g_object_unref (orders);
+  gtk_container_set_border_width (GTK_CONTAINER (tree), 100);
 
   renderer = gtk_cell_renderer_text_new ();
   g_object_set (G_OBJECT (renderer), "editable", TRUE, NULL);
@@ -167,7 +171,11 @@ newprojectdialog (GtkWidget *main_window)
   set_column (column);
   gtk_tree_view_append_column (GTK_TREE_VIEW (tree), column);
 
-  gtk_container_add (GTK_CONTAINER (frame), tree);
+  gtk_grid_attach_next_to (GTK_GRID (grid),
+                           tree,
+                           NULL,
+                           GTK_POS_BOTTOM,
+                           1, 1);
 
   gtk_widget_show_all (dialog);
 
