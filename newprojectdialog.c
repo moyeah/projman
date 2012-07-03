@@ -1,5 +1,7 @@
 #include <gtk/gtk.h>
 
+#include "newprojectgda.h"
+
 static GtkWidget *
 frame_new (GtkWidget *content_area, const char *str)
 {
@@ -220,7 +222,8 @@ newprojectdialog (GtkWidget *main_window)
 
   switch (result)
   {
-    case GTK_RESPONSE_OK:
+    case GTK_RESPONSE_APPLY:
+      create_project ();
       break;
     default:
       break;
