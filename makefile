@@ -9,13 +9,14 @@ OBJS    = ${SOURCES:.c=.o}
 CFLAGS  = `pkg-config gtk+-3.0 libgda-4.0 --cflags`
 LDADD   = `pkg-config gtk+-3.0 libgda-4.0 --libs`
 CC      = gcc
+DEBUG   = -g
 PACKAGE = projman
 
 all: ${OBJS}
-	${CC} -o ${PACKAGE} ${OBJS} ${LDADD}
+	${CC} ${DEBUG} -o ${PACKAGE} ${OBJS} ${LDADD}
 
 .c.o:
-	${CC} ${CFLAGS} -c $<
+	${CC} ${DEBUG} ${CFLAGS} -c $<
 
 clean:
 	rm -f *~ *.o ${PACKAGE}

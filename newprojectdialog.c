@@ -181,9 +181,10 @@ newprojectdialog (GtkWidget *main_window)
   GtkWidget *content_area;
   GtkWidget *grid;
   GtkWidget *name;
-  GtkTextBuffer *description;
+  GtkWidget *description;
   GtkWidget *customer;
   GtkWidget *orders;
+  ProjectInfo *project_info;
 
   dialog = gtk_dialog_new_with_buttons ("Creating a new Project...",
                                         GTK_WINDOW (main_window),
@@ -205,7 +206,7 @@ newprojectdialog (GtkWidget *main_window)
 
   grid = frame_new (content_area, "Project");
   name = entry_new (grid, "_Name");
-  description = ml_entry_new (grid, "_Description");
+  description = entry_new (grid, "_Description");
 
   grid = frame_new (content_area, "Customer");
   customer = entry_new (grid, "_Name");
@@ -223,7 +224,13 @@ newprojectdialog (GtkWidget *main_window)
   switch (result)
   {
     case GTK_RESPONSE_APPLY:
-      create_project ();
+      project_info->name = "Project";
+      project_info->description = "Project";
+      project_info->customer = "Customer";
+      //project_info->name = gtk_entry_get_text (GTK_ENTRY (name));
+//      project_info->description = gtk_entry_get_text (GTK_ENTRY (description));
+      //project_info->customer = gtk_entry_get_text (GTK_ENTRY (customer));
+      create_project (project_info);
       break;
     default:
       break;
