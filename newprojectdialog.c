@@ -2,6 +2,32 @@
 
 #include "newprojectgda.h"
 
+static void
+on_cell_edited (GtkCellRendererText *renderer,
+                gchar               *path_string,
+                gchar               *new_text,
+                gpointer             model)
+{
+  GtkTreeIter row;
+  GtkTreeIter top;
+  guint column_number;
+  gboolean is_on_top;
+
+  gtk_tree_model_get_iter_from_string (model, &row, path_string);
+  column_number = GPOINTER_TO_UINT (g_object_get_data (G_OBJECT (renderer),
+                                    "column"));
+  gtk_tree_store_set (model, &row, column_number, new_text, -1);
+
+  is_on_top = gtk_tree_model_iter_previous (model, &row);
+  if (is_on_top)
+  {
+    g_print ("is_on_top\n");
+    //gtk_tree_store_remove (model, &row);
+  }
+  else
+    g_print ("NOT\n");
+}
+
 static GtkWidget *
 frame_new (GtkWidget *content_area, const char *str)
 {
@@ -94,7 +120,7 @@ ml_entry_new (GtkWidget *grid, const gchar *str)
 }
 
 static GtkWidget *
-orders_new (GtkWidget *grid)
+reference_new (GtkWidget *grid)
 {
 
 enum
@@ -106,26 +132,38 @@ enum
 };
 
 void
-set_column (GtkTreeViewColumn *column)
+add_column (GtkWidget *tree, const gchar *header, guint e_column)
 {
+  GtkCellRenderer *renderer;
+  GtkTreeViewColumn *column;
+
+  renderer = gtk_cell_renderer_text_new ();
+  g_object_set (G_OBJECT (renderer), "editable", TRUE, NULL);
+  g_object_set_data (G_OBJECT (renderer), "column", GUINT_TO_POINTER (e_column));
+  g_signal_connect (renderer, "edited", G_CALLBACK (on_cell_edited),
+                    gtk_tree_view_get_model (GTK_TREE_VIEW(tree)));
+  column = gtk_tree_view_column_new_with_attributes (header,
+                                                     renderer,
+                                                     "text",
+                                                     e_column,
+                                                     NULL);
   gtk_tree_view_column_set_spacing (column, 5);
   gtk_tree_view_column_set_resizable (column, TRUE);
   gtk_tree_view_column_set_expand (column, TRUE);
   gtk_tree_view_column_set_alignment (column, 0.5);
   gtk_tree_view_column_set_reorderable (column, TRUE);
+  gtk_tree_view_append_column (GTK_TREE_VIEW (tree), column);
 }
 
   GtkTreeStore *store;
   GtkTreeIter root_iter;
   GtkTreeIter item_iter;
   GtkWidget *tree;
-  GtkCellRenderer *renderer;
-  GtkTreeViewColumn *column;
 
   store = gtk_tree_store_new (N_COLUMNS,
                               G_TYPE_STRING,
                               G_TYPE_STRING,
-                              G_TYPE_DOUBLE);
+                              G_TYPE_STRING); /* Should be G_TYPE_DOUBLE */
   gtk_tree_store_append (store, &root_iter, NULL);
   gtk_tree_store_append (store, &item_iter, &root_iter);
 
@@ -134,36 +172,9 @@ set_column (GtkTreeViewColumn *column)
   gtk_widget_set_vexpand (tree, TRUE);
   g_object_unref (store);
 
-  renderer = gtk_cell_renderer_text_new ();
-  g_object_set (G_OBJECT (renderer), "editable", TRUE, NULL);
-  column = gtk_tree_view_column_new_with_attributes ("Reference",
-                                                     renderer,
-                                                     "text",
-                                                     REFERENCE,
-                                                     NULL);
-  set_column (column);
-  gtk_tree_view_append_column (GTK_TREE_VIEW (tree), column);
-
-  renderer = gtk_cell_renderer_text_new ();
-  g_object_set (G_OBJECT (renderer), "editable", TRUE, NULL);
-  column = gtk_tree_view_column_new_with_attributes ("Description",
-                                                     renderer,
-                                                     "text",
-                                                     DESCRIPTION,
-                                                     NULL);
-  set_column (column);
-  gtk_tree_view_append_column (GTK_TREE_VIEW (tree), column);
-
-  renderer = gtk_cell_renderer_text_new ();
-  g_object_set (G_OBJECT (renderer), "editable", TRUE, NULL);
-  column = gtk_tree_view_column_new_with_attributes ("Amount",
-                                                     renderer,
-                                                     "text",
-                                                     AMOUNT,
-                                                     NULL);
-
-  set_column (column);
-  gtk_tree_view_append_column (GTK_TREE_VIEW (tree), column);
+  add_column (tree, "Reference", REFERENCE);
+  add_column (tree, "Description", DESCRIPTION);
+  add_column (tree, "Amount", AMOUNT);
 
   gtk_grid_attach_next_to (GTK_GRID (grid),
                            tree,
@@ -181,9 +192,10 @@ newprojectdialog (GtkWidget *main_window)
   GtkWidget *content_area;
   GtkWidget *grid;
   GtkWidget *name;
-  GtkWidget *description;
+  GtkTextBuffer *description;
   GtkWidget *customer;
   GtkWidget *orders;
+  GtkWidget *internal;
   ProjectInfo *project_info;
 
   dialog = gtk_dialog_new_with_buttons ("Creating a new Project...",
@@ -206,16 +218,16 @@ newprojectdialog (GtkWidget *main_window)
 
   grid = frame_new (content_area, "Project");
   name = entry_new (grid, "_Name");
-  description = entry_new (grid, "_Description");
+  description = ml_entry_new (grid, "_Description");
 
   grid = frame_new (content_area, "Customer");
   customer = entry_new (grid, "_Name");
 
   grid = frame_new (content_area, "Orders and Payments");
-  orders = orders_new (grid);
+  orders = reference_new (grid);
 
   grid = frame_new (content_area, "Internal References");
-  orders = orders_new (grid);
+  internal = reference_new (grid);
 
   gtk_widget_show_all (dialog);
 
@@ -224,13 +236,13 @@ newprojectdialog (GtkWidget *main_window)
   switch (result)
   {
     case GTK_RESPONSE_APPLY:
-      project_info->name = "Project";
-      project_info->description = "Project";
-      project_info->customer = "Customer";
+//      project_info->name = "Project";
+//      project_info->description = "Project";
+//      project_info->customer = "Customer";
       //project_info->name = gtk_entry_get_text (GTK_ENTRY (name));
 //      project_info->description = gtk_entry_get_text (GTK_ENTRY (description));
       //project_info->customer = gtk_entry_get_text (GTK_ENTRY (customer));
-      create_project (project_info);
+//      create_project (project_info);
       break;
     default:
       break;

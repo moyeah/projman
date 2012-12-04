@@ -1,9 +1,23 @@
 #include <gtk/gtk.h>
 
-#include "mainwindow.h"
 #include "exitdialog.h"
 #include "menubar.h"
 #include "buttonmenu.h"
+
+static gboolean
+on_delete_event (GtkWidget *widget,
+                 GdkEvent  *event,
+                 gpointer   data)
+{
+  return exitdialog (widget);
+}
+
+static void
+on_destroy (GtkWidget *widget,
+            gpointer   data)
+{
+  gtk_main_quit ();
+}
 
 int
 mainwindow (int argc, char *argv[])
@@ -29,19 +43,11 @@ mainwindow (int argc, char *argv[])
   g_signal_connect (window, "delete-event",
                     G_CALLBACK (on_delete_event), NULL);
   g_signal_connect (window, "destroy",
-                    G_CALLBACK (gtk_main_quit), NULL);
+                    G_CALLBACK (on_destroy), NULL);
 
   gtk_widget_show_all (window);
 
   gtk_main ();
 
   return 0;
-}
-
-static gboolean
-on_delete_event (GtkWidget *widget,
-                 GdkEvent  *event,
-                 gpointer   data)
-{
-  return exitdialog (widget);
 }
